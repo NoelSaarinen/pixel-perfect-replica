@@ -39,7 +39,7 @@ function useSignal(motionLevel: number, gel: boolean) {
       const base = Math.exp(-((p - 0.2) ** 2) / 0.006) + 0.35 * Math.exp(-((p - 0.45) ** 2) / 0.01);
       const amp = (cfg.current.motionLevel / 100) * 2.2 * (cfg.current.gel ? 0.05 : 1);
       const noise = amp * ((Math.random() - 0.5) * 1.6 + Math.sin(t.current * 7) * 0.6 + Math.sin(t.current * 2.3) * 0.8);
-      setData((d) => [...d.slice(1), { i: d[d.length - 1].i + 1, v: base + noise }]);
+      setData((d) => [...d.slice(1), { i: (d[d.length - 1]?.i ?? 0) + 1, v: base + noise }]);
     }, 40);
     return () => clearInterval(id);
   }, []);
