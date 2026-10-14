@@ -142,3 +142,35 @@
     color: var(--color-foreground);
   }
 }
+
+@theme inline {
+  --color-led: var(--led);
+  --color-gel: var(--gel);
+  --color-clean: var(--clean);
+  --color-noisy: var(--noisy);
+  --color-panel: var(--panel);
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+:root {
+  --background: oklch(0.14 0.01 260);
+  --foreground: oklch(0.95 0.01 250);
+  --card: oklch(0.18 0.015 260);
+  --card-foreground: oklch(0.95 0.01 250);
+  --panel: oklch(0.17 0.015 260 / 70%);
+  --muted: oklch(0.24 0.015 260);
+  --muted-foreground: oklch(0.68 0.02 255);
+  --border: oklch(1 0 0 / 9%);
+  --primary: oklch(0.82 0.14 200);
+  --primary-foreground: oklch(0.15 0.02 260);
+  --led: oklch(0.88 0.25 145);
+  --gel: oklch(0.78 0.15 210);
+  --clean: oklch(0.78 0.17 160);
+  --noisy: oklch(0.65 0.23 25);
+  --skin: oklch(0.62 0.09 40);
+  --skin-deep: oklch(0.48 0.1 30);
+  --vessel: oklch(0.45 0.18 25);
+  --metal: oklch(0.32 0.01 260);
+  --metal-hi: oklch(0.55 0.01 260);
+}
+body { font-family: var(--font-display); background-image: radial-gradient(circle at 20% 0%, oklch(0.3 0.08 210 / 25%), transparent 50%), linear-gradient(oklch(1 0 0 / 3%) 1px, transparent 1px), linear-gradient(90deg, oklch(1 0 0 / 3%) 1px, transparent 1px); background-size: auto, 32px 32px, 32px 32px; }
