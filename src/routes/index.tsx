@@ -51,7 +51,7 @@ function CrossSection({ motionLevel, gel }: { motionLevel: number; gel: boolean 
   const shake = m * (gel ? 4 : 18);
   const gap = gel ? 0 : m * 10;
   const beat = 60 / BPM;
-  const rays = [-1, 1];
+  const rays: [number, number] = [-1, 1];
   return (
     <svg viewBox="0 0 400 420" className="h-full w-full">
       <defs>
@@ -119,15 +119,15 @@ function CrossSection({ motionLevel, gel }: { motionLevel: number; gel: boolean 
       {/* Light rays */}
       {[110, 290].map((x, k) =>
         gel ? (
-          <motion.path key={x + "g"} d={`M${x} 170 L${x + rays[k] * -20} 300 Q200 330 200 172`} stroke="var(--led)" strokeWidth="3" fill="none"
+          <motion.path key={x + "g"} d={`M${x} 170 L${x + rays[k as 0] * -20} 300 Q200 330 200 172`} stroke="var(--led)" strokeWidth="3" fill="none"
             strokeDasharray="8 10" animate={{ strokeDashoffset: [0, -36] }} transition={{ duration: 0.6, repeat: Infinity, ease: "linear" }} opacity="0.9" />
         ) : (
           <g key={x + "a"}>
-            <motion.path d={`M${x} 170 L${x + rays[k] * 25} 210 L${x + rays[k] * 110} 150`} stroke="var(--led)" strokeWidth="3" fill="none"
+            <motion.path d={`M${x} 170 L${x + rays[k as 0] * 25} 210 L${x + rays[k as 0] * 110} 150`} stroke="var(--led)" strokeWidth="3" fill="none"
               strokeDasharray="8 10" animate={{ strokeDashoffset: [0, -36] }} transition={{ duration: 0.6, repeat: Infinity, ease: "linear" }} />
-            <motion.path d={`M${x} 170 L${x + rays[k] * -10} 260 Q200 290 200 172`} stroke="var(--led)" strokeWidth="1.5" fill="none" opacity={0.6 - m * 0.5}
+            <motion.path d={`M${x} 170 L${x + rays[k as 0] * -10} 260 Q200 290 200 172`} stroke="var(--led)" strokeWidth="1.5" fill="none" opacity={0.6 - m * 0.5}
               strokeDasharray="4 10" animate={{ strokeDashoffset: [0, -28] }} transition={{ duration: 0.6, repeat: Infinity, ease: "linear" }} />
-            <motion.circle cx={x + rays[k] * 25} cy={210} r="6" fill="var(--led)" animate={{ opacity: [0, 1, 0] }} transition={{ duration: 0.6, repeat: Infinity }} />
+            <motion.circle cx={x + rays[k as 0] * 25} cy={210} r="6" fill="var(--led)" animate={{ opacity: [0, 1, 0] }} transition={{ duration: 0.6, repeat: Infinity }} />
           </g>
         ),
       )}
