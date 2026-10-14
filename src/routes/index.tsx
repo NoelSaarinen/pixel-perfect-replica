@@ -33,13 +33,24 @@ function useSignal(motionLevel: number, gel: boolean) {
   useEffect(() => {
     const id = setInterval(() => {
       t.current += 0.04;
-      const ph = (t.current * BPM) / 60;
-      const p = ph % 1;
-      // PPG-like waveform: systolic peak + dicrotic notch
-      const base = Math.exp(-((p - 0.2) ** 2) / 0.006) + 0.35 * Math.exp(-((p - 0.45) ** 2) / 0.01);
-      const amp = (cfg.current.motionLevel / 100) * 2.2 * (cfg.current.gel ? 0.05 : 1);
-      const noise = amp * ((Math.random() - 0.5) * 1.6 + Math.sin(t.current * 7) * 0.6 + Math.sin(t.current * 2.3) * 0.8);
-      setData((d) => [...d.slice(1), { i: (d[d.length - 1]?.i ?? 0) + 1, v: base + noise }]);
+      const time = t.current;
+      const w = (2 * Math.PI * BPM) / 60; // heartbeat angular frequency
+      const wSlow = 0.5; // baseline-wander angular frequency
+      const m = cfg.current.motionLevel / 100; // slider 0.0–1.0
+      const gel = cfg.current.gel;
+
+      // 1. True signal: clean sine heartbeat
+      //    Index-matching gel eliminates Fresnel losses → +50% amplitude
+      const trueSignal = (gel ? 1.5 : 1.0) * Math.sin(w * time);
+      // 2. High-freq noise: micro-vibrations
+      //    Viscoelastic gel acts as a mechanical low-pass filter (-95%)
+      const hfNoise = m * (Math.random() - 0.5) * (gel ? 0.1 : 2.0);
+      // 3. Low-freq noise: macro-movements / baseline wander
+      //    Gel can't stop macro-movements compressing blood vessels (-45%)
+      const lfNoise = m * Math.sin(wSlow * time) * (gel ? 0.8 : 1.5);
+
+      const v = trueSignal + hfNoise + lfNoise;
+      setData((d) => [...d.slice(1), { i: (d[d.length - 1]?.i ?? 0) + 1, v }]);
     }, 40);
     return () => clearInterval(id);
   }, []);
@@ -141,9 +152,12 @@ function Index() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const data = useSignal(motionLevel, gel);
-  const effNoise = (motionLevel / 100) * (gel ? 0.05 : 1);
-  const quality = Math.round(100 - effNoise * 100);
-  const clean = effNoise < 0.25;
+  const m = motionLevel / 100;
+  // SNR-based quality: signal amplitude vs combined noise envelope (HF + LF)
+  const signalAmp = gel ? 1.5 : 1.0;
+  const noiseAmp = m * (gel ? 0.05 + 0.8 : 1.0 + 1.5);
+  const quality = Math.max(0, Math.min(100, Math.round(100 * (signalAmp / (signalAmp + noiseAmp * 2)) * 2)));
+  const clean = noiseAmp < signalAmp * 0.5;
   const color = clean ? "var(--clean)" : "var(--noisy)";
 
   return (
@@ -175,7 +189,7 @@ function Index() {
               {mounted && (
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={data}>
-                    <YAxis domain={[-2, 3]} hide />
+                    <YAxis domain={[-4, 4]} hide />
                     <Line type="monotone" dataKey="v" stroke={color} strokeWidth={2.5} dot={false} isAnimationActive={false} />
                   </LineChart>
                 </ResponsiveContainer>
